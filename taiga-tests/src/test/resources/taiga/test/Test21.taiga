@@ -1,0 +1,3 @@
+~n: 3
+~Range: [-n..n]
+Range i -> Range j -> i * j

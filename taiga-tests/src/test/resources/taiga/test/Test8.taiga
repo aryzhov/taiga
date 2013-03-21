@@ -1,0 +1,13 @@
+~A {
+	~Nested : {
+		x : 1
+	}
+}
+
+~B: A {
+	~Nested2: Nested
+}
+
+B {
+	y: Nested
+}

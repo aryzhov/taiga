@@ -1,0 +1,287 @@
+Package taiga.parser;
+
+Helpers
+	all = [0 .. 127];
+	cr = 13;
+	lf = 10;
+	newline = cr | lf;
+	blank_char = [' ' + 9 ];
+    digit = ['0' .. '9'];
+    digit_sequence = digit+;
+    single_qoute = 39;
+    letter = [['A'..'Z'] + ['a'..'z']];
+    ascii_valuechar = blank_char | '!' | '"' | '$' | '%' | '&' | single_qoute | '+' | '-' |  '.' | 
+    			'/' | digit | ':' | ';' | '<' | '=' | '>' | '?' | '@' | 
+    			letter | '\' | '^' | '_' | '`' | '|' | '~';
+	ascii = [0 .. 127];
+	id_char = letter | digit | '-' | '_';
+	free_valuechar = [all - [10 + 13]];
+	valuechar = [all - ascii] | ascii_valuechar;
+    leading_id_char = letter | '_';
+    hex_digit = [[digit + ['A'..'F']] + ['a'..'f']]; 
+    four_digit_hex = hex_digit hex_digit hex_digit hex_digit;
+    escape_sequence = '\"' | '\\' | '\/' | '\b' | '\f' | '\n' | '\r' | '\t' | '\u' four_digit_hex;    
+    sign = '+' | '-';
+    string_char = [all - ['"' + ['\' + [10 + 13]]]] | escape_sequence;
+	digits = digit+;
+    int = digits;
+    frac = '.' digits;
+    exp = ('e' | 'E') sign? digits;
+	eol_char = (cr lf | cr | lf);
+
+States
+	normal, free, inline;
+		
+Tokens
+	
+	{normal} tilde = '~';
+	{normal} caret = '^';
+	{normal} dot = '.';
+	{normal} comma = ',';
+	{normal} colon = ':';
+	{normal} semicolon = ';';
+	{normal} l_par = '(';
+	{normal} r_par = ')';
+	{normal} l_bracket = '[';
+	{normal} r_bracket = ']';
+	{normal} l_brace = '{';
+	{normal} r_brace = '}';
+	{normal} equal = '=';	
+	{normal} right_arrow = '->';
+	{normal} question_mark = '?';
+	{normal} eol = eol_char;
+	{normal} blank = blank_char+;
+	{free} free_value = free_valuechar*;
+	{inline} inline_value = valuechar*;
+	{normal} number = int frac? exp?;
+	{normal} string = '"' string_char+ '"';
+	{normal} true = 'true';
+	{normal} false = 'false';
+	{normal} null = 'null';
+	{normal} id = leading_id_char id_char*;
+	{normal} at = '@';
+    {normal} plus = '+';
+    {normal} minus = '-';
+    {normal} mul = '*';
+    {normal} div = '/';
+	{normal} dotdot = '..';
+		
+Ignored Tokens
+	blank;		
+
+Productions
+
+	root {->root} = root_statement_list {-> New root([root_statement_list.statement])};
+
+	root_statement_list {->statement*} = 
+		{last} root_statement eol? {-> [root_statement.statement]} |
+		{non_last} root_statement delim root_statement_list {-> [root_statement.statement, root_statement_list.statement]};
+	
+ 	root_statement {->statement} = 
+ 		{assignment} assignment {-> New statement.assignment(assignment)} |
+		{value} loop_value {-> New statement.value(loop_value.value)} |
+ 		{type_def} type_def {-> New statement.type_def(type_def)};
+	
+	delim =
+		{comma} comma | 
+		{eol} eol;
+	
+	object {-> object} = {id} model? oname {-> New object(model, New name([oname.ident]), [], [])} |
+						 {block} model? blocks {-> New object (model, Null, [], [blocks.block])} |
+						 {id_block} model? oname blocks {-> New object (model, New name([oname.ident]), [], [blocks.block])} |
+						 {id_params} model? oname params {-> New object (model, New name([oname.ident]), [params.param], [])} |
+						 {id_params_block} model? oname params blocks {-> New object (model, New name([oname.ident]), [params.param], [blocks.block])};
+
+	oname {->ident*} = {single} id {->[New ident.id(id)]} |
+				   	   {multi} id oname_tail* {-> [New ident.id(id), oname_tail.ident]};
+	
+	oname_tail {->ident} = dot id {->New ident.id(id)};
+
+	blocks {->block*} =
+		{one} block {->[block]} |
+		{more} block blocks {->[block, blocks.block]};
+
+ 	params {-> param*} = 
+ 				{empty} l_par r_par {-> []} |
+ 				{non_empty} l_par param_list r_par {-> [param_list.param]};
+
+	param_list {-> param*} = 
+		{one} param {->[param.param]} |
+		{many} param delim [tail]:param_list {->[param.param, tail.param]};
+	
+	param {->param} =
+		{named} [param]:named_param {->param.param} |
+		{unnamed} [param]:unnamed_param {->param.param};
+	
+ 	named_param {-> param} = 
+ 		{strict} id colon [value]:strict_value {-> New param(id, value.value)} |
+ 		{relaxed} id equal [value]:relaxed_value {-> New param(id, value.value)};
+ 	
+ 	unnamed_param {->param} = 
+ 		 {strict} [value]:strict_value {-> New param(Null, value.value)} |
+ 		 {relaxed} equal [value]:relaxed_value {-> New param(Null, value.value)};
+
+ 	block {-> block} = 
+ 		{curly} l_brace statement_list r_brace {-> New block.object([statement_list.statement])} |
+ 		{curly_empty} l_brace r_brace {-> New block.object([])} |
+ 		{array} l_bracket value_list r_bracket {-> New block.array([value_list.value])} |
+ 		{array_empty} l_bracket r_bracket {-> New block.array([])};
+	
+	statement_list {->statement*} = 
+		{last} statement eol? {-> [statement]} |
+		{non_last} statement delim statement_list {-> [statement, statement_list.statement]};
+	
+ 	statement {->statement} = 
+ 		{assignment} assignment {-> New statement.assignment(assignment)} |
+ 		{init} initialization {-> New statement.initialization(initialization)} |
+ 		{type_def} type_def {-> New statement.type_def(type_def)};
+ 	
+	value_list {->value*} = 
+		{one} [value]:loop_value eol? {-> [value.value]} |
+		{more} [value]:loop_value delim value_list {-> [value.value, value_list.value]};
+	
+	loop_value {-> value } =
+		{strict} [value]:strict_value {-> value.value} |
+		{relaxed} equal [value]:relaxed_value {-> value.value};
+	
+ 	assignment {->assignment} = 
+ 		{colon} name colon strict_value {-> New assignment(name, strict_value.value)} |
+ 		{equal} name equal relaxed_value {-> New assignment(name, relaxed_value.value)};
+ 	
+	type_def = 
+ 		{blocks} tilde id param_defs model? blocks {-> New type_def(id, [param_defs.param_def], New value.object(New object(model, Null, [], [blocks.block])))} |
+ 		{colon} tilde id param_defs colon strict_value {-> New type_def(id, [param_defs.param_def], strict_value.value)} |
+ 		{equal} tilde id param_defs equal relaxed_value {-> New type_def(id, [param_defs.param_def], relaxed_value.value)};
+		
+ 	param_defs {-> param_def*} = 
+ 			{empty} {-> []} |
+ 			{non_empty} l_par param_def_list r_par {-> [param_def_list.param_def]};
+
+	param_def_list {-> param_def*} = 
+		{empty} {-> []} |
+		{non_empty} param_def param_def_list_tail* {-> [param_def, param_def_list_tail.param_def]};
+	
+	param_def_list_tail {->param_def} = delim param_def {->param_def};
+ 	
+ 	param_def {->param_def} = id {-> New param_def(id)};
+
+ 	initialization {->initialization} = name block {-> New initialization(name, [block])};
+ 	
+	value {-> value } =
+		{strict} strict_value {-> strict_value.value } |
+ 		{relaxed} relaxed_value {-> relaxed_value.value };
+
+	relaxed_value {-> value } = 
+ 		{free} free_value {-> New value.free(free_value)} |
+ 		{inline} inline_value {-> New value.inline(inline_value)};
+
+	strict_value {->value} =
+		{expr} [e]:e_expression {->e.value} |
+		{select} [e]:e_expression question_mark block {-> New value.select(New select(e.value, block))} |
+		{loop} [range]:object [loop_var]:id right_arrow [v]:strict_value {-> New value.loop(New loop(range, loop_var), v.value)};
+
+	e_expression {->value} =
+		{add} [a]:e_expression plus [b]:t_expression {-> New value.add(a.value, b.value)} | 
+		{sub} [a]:e_expression minus [b]:t_expression {-> New value.sub(a.value, b.value)} | 
+		{last} [a]:t_expression {->a.value};
+		
+	t_expression {->value} =
+		{mul} [a]:t_expression mul [b]:f_expression {-> New value.mul(a.value, b.value)} |
+		{div} [a]:t_expression div [b]:f_expression {-> New value.div(a.value, b.value)} |
+		{last} [a]:f_expression {->a.value};
+
+	f_expression {->value} =
+		{simple} [a]:i_expression {->a.value} |
+		{neg} minus [a]:i_expression {->New value.neg(a.value)} |
+		{parens} l_par [a]:e_expression r_par {->a.value} |
+		{range} l_bracket [a]:e_expression dotdot [b]:e_expression r_bracket {->New value.range(a.value, b.value)};  
+
+	i_expression {-> value } =  
+		{constant} constant {-> New value.constant(constant)} |
+		{object} object {-> New value.object(object)} |
+		{reference} caret name {-> New value.reference(New reference(name))};
+
+	constant = 
+		{number} number {-> New constant.number(number)} |
+		{string} string {-> New constant.string(string)}  |
+		{true} true {-> New constant.boolean(New boolean.true(true))} |
+		{false} false {-> New constant.boolean(New boolean.false(false))} |
+		{null} null {-> New constant.null(null)};
+
+	
+	name {->name} = {oname} oname {->New name([oname.ident])} |
+					{cname} cname {->New name([cname.ident])};
+
+	cname {->ident*} = {oname} oname dot constant cname_tail* {->[oname.ident, New ident.const(constant), cname_tail.ident]} | 
+					{single} constant {->[New ident.const(constant)]} |
+				    {multi} constant cname_tail* {->[New ident.const(constant), cname_tail.ident]};
+	
+	ident {->ident} = 
+		{id} id {->New ident.id(id)} |
+		{const} constant {->New ident.const(constant)};
+	
+	cname_tail {->ident} = dot ident {->ident};
+	
+	model = at id {-> New model(id)};
+	
+Abstract Syntax Tree
+	
+	root = [statements]: statement*;
+
+	statement = {assignment} assignment | 
+				{type_def} type_def | 
+				{initialization} initialization |
+				{value} value;	
+
+	assignment = name value;
+
+	type_def = [type_name]:id param_def* value;
+	
+	param_def = id;
+	
+	initialization = name [blocks]:block*;
+	
+	value = {constant} constant | 
+			{free} free_value | 
+			{inline} inline_value | 
+			{object} object |
+			{reference} reference |
+			{select} select |
+			{loop} loop value | 
+			{add} [a]:value [b]:value |
+			{sub} [a]:value [b]:value |
+			{mul} [a]:value [b]:value |
+			{div} [a]:value [b]:value |
+			{neg} value |
+			{range} [a]:value [b]:value; 
+			
+	object = model? name? [params]:param* [blocks]:block*;
+
+	block = {object} [statements]:statement* | 
+			{array} [values]:value*;
+
+	loop = object [loop_var]:id;
+
+	param = [param_name]:id? value;	
+	
+	constant =
+		{number} number |
+		{string} string |
+		{boolean} boolean |
+		{null} null;
+
+	boolean = {true} true |
+			  {false} false;
+	
+	name = [parts]:ident*;
+
+	ident = 
+		{id} id |
+		{const} constant;
+
+	reference = name;
+
+	select = value [selector]:block;
+
+	model = id;
+	

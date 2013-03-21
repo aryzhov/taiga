@@ -1,0 +1,4 @@
+Test1: @html HTML {
+	title=Hello
+	body [=Taiga rulez!]
+}

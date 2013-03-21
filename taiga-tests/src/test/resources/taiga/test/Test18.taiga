@@ -1,0 +1,15 @@
+@bean taiga.test.ValueSampler {
+
+	intValue: 14
+	stringValue: 14
+	booleanValue = true
+	
+	nested {
+		stringValue=Hello
+	}
+
+	nested2: Nested {
+		stringValue=world
+	}
+
+}

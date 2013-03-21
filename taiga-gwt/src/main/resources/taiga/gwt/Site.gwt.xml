@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module rename-to='Site'>
+  <inherits name='com.google.gwt.user.User' />
+
+  <inherits name='com.google.gwt.user.theme.standard.Standard' />
+  <!-- <inherits name='com.google.gwt.user.theme.chrome.Chrome'/> -->
+  <!-- <inherits name='com.google.gwt.user.theme.dark.Dark'/>     -->
+
+  <inherits name='taiga.Parser' />
+  <!-- Specify the app entry point class.                         -->
+  <entry-point class='taiga.gwt.client.Site' />
+
+  <source path='client' />
+  <source path='model' />
+
+</module>

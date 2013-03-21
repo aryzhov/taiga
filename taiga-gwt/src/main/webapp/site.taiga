@@ -1,0 +1,6 @@
+Page: Page {
+	windowTitle = Hello
+	root : HTML {
+		src=Hello, world!
+	}
+}

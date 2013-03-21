@@ -1,8 +1,7 @@
-*/.settings/
-*/target/
-*/gwt-unitCache/
-*/.apt_generated/
-*/generated-classes/
-*/war/WEB-INF/deploy/
-*/war/WEB-INF/classes/
-
+*/.p4ignore
+*/src/main/webapp/.p4ignore
+**/.settings
+**/target
+*/src/main/gwt-unitCache
+*/generated-sources
+*/src/main/webapp/WEB-INF/deploy/**
