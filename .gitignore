@@ -1,0 +1,8 @@
+*/.settings/
+*/target/
+*/gwt-unitCache/
+*/.apt_generated/
+*/generated-classes/
+*/war/WEB-INF/deploy/
+*/war/WEB-INF/classes/
+
