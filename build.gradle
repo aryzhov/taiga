@@ -1,0 +1,49 @@
+subprojects {
+    apply plugin: 'eclipse'
+    apply plugin: 'java'
+
+    repositories { mavenCentral() }
+
+    compileJava {
+    	options.warnings = false
+    }
+}
+
+project(':taiga-beans') {
+    dependencies {
+	compile project(':taiga-parser')
+    }
+}
+
+project(':taiga-html') {
+    dependencies {
+	compile project(':taiga-parser')
+        compile 'xerces:xercesImpl:2.10.0'
+        compile 'xalan:xalan:2.7.1'
+    }
+}
+
+project(':taiga-io') {
+    dependencies {
+	compile project(':taiga-parser')
+    }
+}
+
+project(':taiga-servlet') {
+    dependencies {
+	compile project(':taiga-parser')
+	compile project(':taiga-html')
+	compile project(':taiga-io')
+	compile 'javax.servlet:servlet-api:2.5'
+    }
+}
+
+project(':taiga-tests') {
+    dependencies {
+	compile project(':taiga-parser')
+	compile project(':taiga-io')
+	compile project(':taiga-beans')
+	compile project(':taiga-html')
+	compile 'junit:junit:4.8.1'
+    }
+}

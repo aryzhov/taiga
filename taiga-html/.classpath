@@ -1,37 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" output="target/classes" path="src/main/java">
-		<attributes>
-			<attribute name="optional" value="true"/>
-			<attribute name="maven.pomderived" value="true"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry excluding="**" kind="src" output="target/classes" path="src/main/resources">
-		<attributes>
-			<attribute name="maven.pomderived" value="true"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="src" output="target/test-classes" path="src/test/java">
-		<attributes>
-			<attribute name="optional" value="true"/>
-			<attribute name="maven.pomderived" value="true"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry excluding="**" kind="src" output="target/test-classes" path="src/test/resources">
-		<attributes>
-			<attribute name="maven.pomderived" value="true"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6">
-		<attributes>
-			<attribute name="maven.pomderived" value="true"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="con" path="org.eclipse.m2e.MAVEN2_CLASSPATH_CONTAINER">
-		<attributes>
-			<attribute name="maven.pomderived" value="true"/>
-			<attribute name="org.eclipse.jst.component.nondependency" value=""/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="output" path="target/classes"/>
+	<classpathentry kind="output" path="bin"/>
+	<classpathentry kind="src" path="src/main/java"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER" exported="true"/>
+	<classpathentry kind="src" path="/taiga-parser" exported="true"/>
+	<classpathentry sourcepath="C:/Users/aryzhov/.gradle/caches/artifacts-23/filestore/xerces/xercesImpl/2.10.0/source/3776e74cb2ceb96394a53138e9947a45d744ab35/xercesImpl-2.10.0-sources.jar" kind="lib" path="C:/Users/aryzhov/.gradle/caches/artifacts-23/filestore/xerces/xercesImpl/2.10.0/jar/9161654d2afe7f9063455f02ccca8e4ec2787222/xercesImpl-2.10.0.jar" exported="true"/>
+	<classpathentry sourcepath="C:/Users/aryzhov/.gradle/caches/artifacts-23/filestore/xalan/xalan/2.7.1/source/b1f9b407f3593c99ae2b137bb0733761fcee6595/xalan-2.7.1-sources.jar" kind="lib" path="C:/Users/aryzhov/.gradle/caches/artifacts-23/filestore/xalan/xalan/2.7.1/jar/75f1d83ce27bab5f29fff034fc74aa9f7266f22a/xalan-2.7.1.jar" exported="true"/>
+	<classpathentry sourcepath="C:/Users/aryzhov/.gradle/caches/artifacts-23/filestore/xml-apis/xml-apis/1.4.01/source/5502da0c4c0a7916a604356ef19394ccfa30cd4b/xml-apis-1.4.01-sources.jar" kind="lib" path="C:/Users/aryzhov/.gradle/caches/artifacts-23/filestore/xml-apis/xml-apis/1.4.01/jar/3789d9fada2d3d458c4ba2de349d48780f381ee3/xml-apis-1.4.01.jar" exported="true"/>
+	<classpathentry kind="lib" path="C:/Users/aryzhov/.gradle/caches/artifacts-23/filestore/xalan/serializer/2.7.1/jar/4b4b18df434451249bb65a63f2fb69e215a6a020/serializer-2.7.1.jar" exported="true"/>
 </classpath>

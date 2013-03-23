@@ -1,0 +1,30 @@
+apply plugin: 'java'
+apply plugin: 'eclipse'
+
+def grammarFile = file('src/main/sablecc/taiga.grammar')
+def generatedSourcesDir = file('build/generated-sources/sablecc')
+
+task makeGeneratedSourcesDir {
+	generatedSourcesDir.mkdirs()
+}
+
+task generateSources(type:JavaExec) {
+	main = 'org.sablecc.sablecc.SableCC'
+	classpath file('tools/sablecc-3.2-1.jar')
+	args = ['-d', generatedSourcesDir.absolutePath, grammarFile.absolutePath]
+}
+
+task makeGWTCompatible << {
+    new GroovyShell().run(file('src/main/build/FixIt.groovy'), [generatedSourcesDir.absolutePath, 'taiga.parser'] as String[])
+}
+
+compileJava.dependsOn generateSources, makeGWTCompatible
+
+sourceSets {
+    main {
+        java {
+            srcDir generatedSourcesDir
+        }
+    }
+}
+

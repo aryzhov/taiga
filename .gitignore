@@ -1,7 +1,12 @@
+.metadata
+.gradle
+*/.gradle
+*/bin
+*/target
 */.p4ignore
 */src/main/webapp/.p4ignore
-**/.settings
-**/target
+*/.settings
+*/build
 */src/main/gwt-unitCache
 */generated-sources
 */src/main/webapp/WEB-INF/deploy/**

@@ -1,0 +1,5 @@
+rootProject.name='taiga'
+include 'taiga-parser', 'taiga-beans', 'taiga-io', 'taiga-html', 'taiga-tests', 'taiga-servlet'
+
+
+

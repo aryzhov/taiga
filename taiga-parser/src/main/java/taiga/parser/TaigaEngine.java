@@ -14,7 +14,6 @@ import taiga.interfaces.ModelException;
 import taiga.interfaces.Position;
 import taiga.interfaces.ResourceProvider;
 import taiga.interfaces.TaigaException;
-import taiga.model.CoreModel;
 import taiga.model.CoreModelFactory;
 import taiga.parser.InstanceContext.Mode;
 import taiga.parser.ParserContext.Owner;
